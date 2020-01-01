@@ -1,6 +1,5 @@
 package com.mahmoudmabrok.catechwords.features.displayWords;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +40,6 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.Holder> {
     }
 
     public void setList(List<Word> newList) {
-        Log.d(TAG, "setTafseerList: " + newList.size());
         list = new ArrayList<>(newList);
         notifyDataSetChanged();
     }
@@ -71,7 +69,7 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.Holder> {
         @BindView(R.id.tvWord)
         TextView tvWord;
 
-        public Holder(@NonNull View itemView) {
+        Holder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
