@@ -1,5 +1,6 @@
 package com.mahmoudmabrok.catechwords.features.displayWords
 
+import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,13 +13,14 @@ import com.mahmoudmabrok.catechwords.util.log
 import java.util.*
 
 
-class WordAdapter : RecyclerView.Adapter<WordAdapter.Holder>() {
+class WordAdapter(val listener:IScoreListener) : RecyclerView.Adapter<WordAdapter.Holder>() {
     private var list: ArrayList<Word> = ArrayList()
     private var finished: ArrayList<Int> = ArrayList()
     private var firstSelected = -1
-    private var secondSelected = -1
+    private var countOfSelected = 0
 
     private val MAX_SELECTEED = 2
+    private val INTERVAL = 300L
 
     fun setList(newList: ArrayList<Word>) {
         list = ArrayList(newList)
@@ -33,25 +35,21 @@ class WordAdapter : RecyclerView.Adapter<WordAdapter.Holder>() {
 
 
     override fun onBindViewHolder(holder: Holder, i: Int) {
-        "onBindViewHolder $i, first:$firstSelected second:$secondSelected".log()
+        "onBindViewHolder $i, first:$firstSelected ".log()
         if (finished.contains(i)) {
             holder.itemView.visibility = View.INVISIBLE
         } else {
             holder.itemView.visibility = View.VISIBLE
             if (i == firstSelected) {
-                "${i == firstSelected} ${i == secondSelected}".log()
                 holder.tvWord.text = list[i].word
             } else {
                 holder.tvWord.text = ""
             }
         }
 
-
         holder.itemView.setOnClickListener {
-            "## i$i, first:$firstSelected second:$secondSelected".log()
             when {
                 firstSelected == i -> {
-                    // case an already firstSelected item
                     alreadyCase(i)
                 }
 
@@ -60,52 +58,72 @@ class WordAdapter : RecyclerView.Adapter<WordAdapter.Holder>() {
                 }
 
                 firstSelected >= 0 -> {
-                    // place to ui
-                    holder.tvWord.text = list[i].word
-                    checkCase(i)
+                    countOfSelected++
+                    holder.tvWord.text = list[i].word // place to ui
+                    object : CountDownTimer(INTERVAL, INTERVAL) {
+                        override fun onFinish() {
+                            checkCase(i)
+                        }
+
+                        override fun onTick(p0: Long) {
+                        }
+
+                    }.start()
+
                 }
+
+
             }
         }
 
+        "finished.size == list.size"
+/*
+        if (finished.size == list.size){
+            "finised ${finished.size}"
+             listener.onFinish()
+        }*/
     }
 
 
+    /**
+     * when click on item that already clicked so ->  hide test
+     */
     private fun alreadyCase(i: Int) {
-        //todo  (1) flip
+        countOfSelected--
         firstSelected = -1
         notifyItemChanged(i)
-        notifyItemRangeChanged(i, 1)
 
     }
 
+    /**
+     * first card to be clicked so show it's content
+     */
     private fun firstSelected(i: Int) {
+        countOfSelected++
         firstSelected = i  // add to firstSelected list
         notifyItemChanged(i)
-        notifyItemRangeChanged(i, 1)
     }
 
     /**
      * select second item so we must check
      */
     private fun checkCase(secondIdx: Int) {
-        "check".log()
         val prev = list[firstSelected]
         val current = list[secondIdx]
-
-        // wait before apply action
+        // extension function to test is two cards are correct
         if (current.isSame(prev)) {
-            // colorCorrect()
             // add ot finished to be hidden next bind
             finished.add(firstSelected)
             finished.add(secondIdx)
-            "correct".log()
+            listener.onCorrect()
         } else {
+            //todo make vibrate
             "Wrong".log()
         }
         // so when check again  on onBind it will be cleared
         // for second one it is not first index so not displayed at onBind
         firstSelected = -1
-        notifyDataSetChanged()
+        notifyDataSetChanged() //todo find less way
     }
 
 
@@ -119,9 +137,9 @@ class WordAdapter : RecyclerView.Adapter<WordAdapter.Holder>() {
 
     }
 
-    companion object {
-
-        private val TAG = "TafseerAdapter"
+    interface IScoreListener{
+        fun onCorrect()
+        fun onFinish()
     }
 
 }
