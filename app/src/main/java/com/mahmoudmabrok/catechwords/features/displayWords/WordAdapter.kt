@@ -7,13 +7,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.mahmoudmabrok.catechwords.R
 import com.mahmoudmabrok.catechwords.model.Word
+import com.mahmoudmabrok.catechwords.model.isSame
+import com.mahmoudmabrok.catechwords.util.log
 import java.util.*
 
 
 class WordAdapter : RecyclerView.Adapter<WordAdapter.Holder>() {
     private var list: ArrayList<Word> = ArrayList()
     private var finished: ArrayList<Int> = ArrayList()
-    private var selected = -1
+    private var firstSelected = -1
+    private var secondSelected = -1
 
     private val MAX_SELECTEED = 2
 
@@ -30,12 +33,13 @@ class WordAdapter : RecyclerView.Adapter<WordAdapter.Holder>() {
 
 
     override fun onBindViewHolder(holder: Holder, i: Int) {
+        "onBindViewHolder $i, first:$firstSelected second:$secondSelected".log()
         if (finished.contains(i)) {
-            // item was correctly selected
             holder.itemView.visibility = View.INVISIBLE
         } else {
             holder.itemView.visibility = View.VISIBLE
-            if (i == selected) {
+            if (i == firstSelected) {
+                "${i == firstSelected} ${i == secondSelected}".log()
                 holder.tvWord.text = list[i].word
             } else {
                 holder.tvWord.text = ""
@@ -43,20 +47,22 @@ class WordAdapter : RecyclerView.Adapter<WordAdapter.Holder>() {
         }
 
 
-
         holder.itemView.setOnClickListener {
+            "## i$i, first:$firstSelected second:$secondSelected".log()
             when {
-                selected == i -> {
-                    // case an already selected item
+                firstSelected == i -> {
+                    // case an already firstSelected item
                     alreadyCase(i)
                 }
 
-                selected == -1 -> {
+                firstSelected == -1 -> {
                     firstSelected(i)
                 }
 
-                selected >= 0 -> {
-                    checkCase(i, holder)
+                firstSelected >= 0 -> {
+                    // place to ui
+                    holder.tvWord.text = list[i].word
+                    checkCase(i)
                 }
             }
         }
@@ -66,15 +72,14 @@ class WordAdapter : RecyclerView.Adapter<WordAdapter.Holder>() {
 
     private fun alreadyCase(i: Int) {
         //todo  (1) flip
-        selected = -1
+        firstSelected = -1
         notifyItemChanged(i)
         notifyItemRangeChanged(i, 1)
 
     }
 
     private fun firstSelected(i: Int) {
-        // todo  (1) flip
-        selected = i  // add to selected list
+        firstSelected = i  // add to firstSelected list
         notifyItemChanged(i)
         notifyItemRangeChanged(i, 1)
     }
@@ -82,29 +87,25 @@ class WordAdapter : RecyclerView.Adapter<WordAdapter.Holder>() {
     /**
      * select second item so we must check
      */
-    private fun checkCase(secondIdx: Int, holder: WordAdapter.Holder) {
-        // todo  (1) flip
-        val prev = list[selected]
+    private fun checkCase(secondIdx: Int) {
+        "check".log()
+        val prev = list[firstSelected]
         val current = list[secondIdx]
-        // place word in UI
-        holder.tvWord.text = current.word
+
         // wait before apply action
-        /*  Thread.sleep(1000)
-          Log.d("TTA" , "after")
-          if (current.isSame(prev)){
-              // colorCorrect()
-              // remove two elements
-              finished.add(selected)
-              finished.add(secondIdx)
-              notifyDataSetChanged()
-              Log.d("TTA" , "correct")
-          }else{
-              // false case
-              holder.tvWord.text = "" // clear current one
-              Log.d("TTA" , "Wrong")
-          }
-          selected = -1 // to select again
-  */
+        if (current.isSame(prev)) {
+            // colorCorrect()
+            // add ot finished to be hidden next bind
+            finished.add(firstSelected)
+            finished.add(secondIdx)
+            "correct".log()
+        } else {
+            "Wrong".log()
+        }
+        // so when check again  on onBind it will be cleared
+        // for second one it is not first index so not displayed at onBind
+        firstSelected = -1
+        notifyDataSetChanged()
     }
 
 
