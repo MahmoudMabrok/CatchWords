@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.mahmoudmabrok.catechwords.R
 import com.mahmoudmabrok.catechwords.data.DataSource
+import com.mahmoudmabrok.catechwords.model.Word
 import kotlinx.android.synthetic.main.activity_display_words.*
 
 class DisplayWords : AppCompatActivity() {
@@ -21,6 +22,18 @@ class DisplayWords : AppCompatActivity() {
 
     private fun setup() {
         rvWords.adapter = adapter
-        adapter.list = DataSource.data
+        adapter.setList(getData())
+    }
+
+    private fun getData(): java.util.ArrayList<Word> {
+        val list = java.util.ArrayList<Word>()
+        for (word in DataSource.data) {
+            list.add(word)
+            list.add(word.getReflected())
+        }
+        list.shuffle()
+        list.shuffle()
+        list.shuffle()
+        return list
     }
 }
