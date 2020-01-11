@@ -7,9 +7,9 @@ class DataSource {
 
     companion object {
         val data = listOf(
-            Word("A", "أ"),
-            Word("B", "ب"),
-            Word("C", "ث")
+            Word("Do", "يفعل"),
+            Word("Play", "يلعب"),
+            Word("Work", "يعمل")
         )
 
 
