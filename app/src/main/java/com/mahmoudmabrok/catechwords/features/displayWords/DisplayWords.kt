@@ -1,6 +1,5 @@
 package com.mahmoudmabrok.catechwords.features.displayWords
 
-import android.content.Context
 import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import com.mahmoudmabrok.catechwords.R
@@ -10,11 +9,17 @@ import com.mahmoudmabrok.catechwords.util.Rumble
 import com.mahmoudmabrok.catechwords.util.showToast
 import kotlinx.android.synthetic.main.activity_display_words.*
 import kotlinx.android.synthetic.main.score_layout.*
+import kotlinx.android.synthetic.main.timper_layout.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class DisplayWords : AppCompatActivity(), WordAdapter.IScoreListener {
 
     lateinit var adapter:WordAdapter
     private var score = 0
+    private lateinit var job :Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +31,23 @@ class DisplayWords : AppCompatActivity(), WordAdapter.IScoreListener {
         setup()
         Rumble.init(applicationContext)
         setScoreInUi()
+        startTiming()
+    }
+
+    private fun startTiming() {
+        job  = GlobalScope.launch {
+            for (i in 10 downTo 1 ) {
+                tvTime.text = "00:$i"
+                delay(1000)
+            }
+            failed()
+            finish()
+        }
+        job.start()
+    }
+
+    private fun failed(){
+        this.showToast("FAILED")
     }
 
     private fun setScoreInUi() {
@@ -44,6 +66,7 @@ class DisplayWords : AppCompatActivity(), WordAdapter.IScoreListener {
             list.add(word.getReflected())
         }
         list.shuffle()
+        list.addAll(list)
         return list
     }
 
@@ -54,6 +77,7 @@ class DisplayWords : AppCompatActivity(), WordAdapter.IScoreListener {
 
 
     override fun onFinishGame() {
+        job.cancel() // stop timer
         this.showToast(" Success!!!!")
         score = 0
         object :CountDownTimer(700,500){
@@ -68,7 +92,7 @@ class DisplayWords : AppCompatActivity(), WordAdapter.IScoreListener {
     }
 
     override fun vibrate() {
-        Rumble.once(1200)
+        Rumble.once(200)
     }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {

@@ -9,6 +9,8 @@
     android:orientation="vertical"
     tools:context=".features.displayWords.DisplayWords">
 
+
+    <include layout="@layout/timper_layout"/>
     <include layout="@layout/score_layout"/>
 
     <androidx.recyclerview.widget.RecyclerView

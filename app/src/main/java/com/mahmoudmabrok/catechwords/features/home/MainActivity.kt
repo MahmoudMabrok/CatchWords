@@ -18,7 +18,5 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, DisplayWords::class.java)
         startActivity(intent)
 
-//        this.goto(DisplayWords::class.java)
-
     }
 }
