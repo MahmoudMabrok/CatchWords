@@ -13,8 +13,7 @@ import com.mahmoudmabrok.catechwords.util.log
 import java.util.*
 
 
-class WordAdapter(val listener:IScoreListener) : RecyclerView.Adapter<WordAdapter.Holder>() {
-    private var list: ArrayList<Word> = ArrayList()
+class WordAdapter(val listener:IScoreListener,var list: ArrayList<Word>) : RecyclerView.Adapter<WordAdapter.Holder>() {
     private var finished: ArrayList<Int> = ArrayList()
     private var firstSelected = -1
     private var countOfSelected = 0
@@ -22,10 +21,10 @@ class WordAdapter(val listener:IScoreListener) : RecyclerView.Adapter<WordAdapte
     private val MAX_SELECTEED = 2
     private val INTERVAL = 300L
 
-    fun setList(newList: ArrayList<Word>) {
+  /*  fun setList(newList: ArrayList<Word>) {
         list = ArrayList(newList)
         notifyDataSetChanged()
-    }
+    }*/
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): Holder {
         val view =
@@ -63,6 +62,9 @@ class WordAdapter(val listener:IScoreListener) : RecyclerView.Adapter<WordAdapte
                     object : CountDownTimer(INTERVAL, INTERVAL) {
                         override fun onFinish() {
                             checkCase(i)
+                            if (finished.size == list.size){
+                                listener.onFinishGame()
+                            }
                         }
 
                         override fun onTick(p0: Long) {
@@ -76,8 +78,8 @@ class WordAdapter(val listener:IScoreListener) : RecyclerView.Adapter<WordAdapte
             }
         }
 
-        "finished.size == list.size"
-/*
+
+       /*
         if (finished.size == list.size){
             "finised ${finished.size}"
              listener.onFinish()
@@ -117,8 +119,7 @@ class WordAdapter(val listener:IScoreListener) : RecyclerView.Adapter<WordAdapte
             finished.add(secondIdx)
             listener.onCorrect()
         } else {
-            //todo make vibrate
-            "Wrong".log()
+            listener.vibrate()
         }
         // so when check again  on onBind it will be cleared
         // for second one it is not first index so not displayed at onBind
@@ -139,7 +140,8 @@ class WordAdapter(val listener:IScoreListener) : RecyclerView.Adapter<WordAdapte
 
     interface IScoreListener{
         fun onCorrect()
-        fun onFinish()
+        fun onFinishGame()
+        fun vibrate()
     }
 
 }
