@@ -19,3 +19,7 @@ fun Context.showToast(msg: String) {
 fun String.log() {
     Log.d("P11", this)
 }
+
+fun Int.getNum():String{
+    return if (this / 10 > 0) this.toString() else "0$this"
+}

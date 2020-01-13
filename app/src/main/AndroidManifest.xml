@@ -13,10 +13,14 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".features.displayWords.DisplayWords"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"
+            />
+
         <activity android:name=".features.home.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -6,20 +6,19 @@ import com.mahmoudmabrok.catechwords.R
 import com.mahmoudmabrok.catechwords.data.DataSource
 import com.mahmoudmabrok.catechwords.model.Word
 import com.mahmoudmabrok.catechwords.util.Rumble
+import com.mahmoudmabrok.catechwords.util.getNum
+import com.mahmoudmabrok.catechwords.util.log
 import com.mahmoudmabrok.catechwords.util.showToast
 import kotlinx.android.synthetic.main.activity_display_words.*
 import kotlinx.android.synthetic.main.score_layout.*
 import kotlinx.android.synthetic.main.timper_layout.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class DisplayWords : AppCompatActivity(), WordAdapter.IScoreListener {
 
     lateinit var adapter:WordAdapter
     private var score = 0
-    private lateinit var job :Job
+    private lateinit var job : Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,23 +28,25 @@ class DisplayWords : AppCompatActivity(), WordAdapter.IScoreListener {
             score = savedInstanceState.getInt("score")
 
         setup()
-        Rumble.init(applicationContext)
+       // Rumble.init(applicationContext)
         setScoreInUi()
         startTiming()
     }
 
     private fun startTiming() {
-        job  = GlobalScope.launch {
-            for (i in 10 downTo 1 ) {
-                tvTime.text = "00:$i"
+        "start".log()
+        job  = GlobalScope.launch(Dispatchers.Main) {
+            for (i in 15 downTo 1 ) {
+                tvTime.text = "00:${i.getNum()}"
                 delay(1000)
+                "start!!".log()
             }
+            "start@@@".log()
             failed()
             finish()
         }
         job.start()
     }
-
     private fun failed(){
         this.showToast("FAILED")
     }
@@ -66,7 +67,7 @@ class DisplayWords : AppCompatActivity(), WordAdapter.IScoreListener {
             list.add(word.getReflected())
         }
         list.shuffle()
-        list.addAll(list)
+     //   list.addAll(list)
         return list
     }
 
@@ -92,7 +93,7 @@ class DisplayWords : AppCompatActivity(), WordAdapter.IScoreListener {
     }
 
     override fun vibrate() {
-        Rumble.once(200)
+     //   Rumble.once(200)
     }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
